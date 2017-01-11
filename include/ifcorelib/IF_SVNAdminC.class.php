@@ -67,7 +67,7 @@ class IF_SVNAdminC extends IF_SVNBaseC
 		}
 
 		// Validate repository name.
-		$pattern = '/^([a-z0-9\_\-.]+)$/i';
+		$pattern = '/^([a-z0-9\_\-]+)$/i';
 		$repo_name = basename($path);
 
 		if (!preg_match($pattern, $repo_name))
@@ -96,6 +96,16 @@ class IF_SVNAdminC extends IF_SVNBaseC
 		{
 			throw new IF_SVNCommandExecutionException('Command='.$cmd.'; Return='.$exitCode.'; Output='.$output.';');
 		}
+		
+		//jouwei start
+		if (!empty($this->config_directory))
+		{
+			if(defined("IF_System_CopyCmd")){
+				$cmd = IF_System_CopyCmd ." ".escapeshellarg($this->config_directory)."/* ". self::encode_local_path($path)."/conf/ ";
+				exec($cmd, $output, $exitCode);
+			}
+		}
+		//jouwei end
 	}
 
 	/**
