@@ -24,6 +24,7 @@
  * - define("IF_HtPasswd_DefaultCrypt", "CRYPT")
  * - define("IF_HtPasswd_DefaultCrypt", "SHA1")
  * - define("IF_HtPasswd_DefaultCrypt", "MD5")
+ * define("IF_HtPasswd_DefaultCrypt", "")
  *
  * @author Manuel Freiholz, insaneFactory.com
  */
@@ -210,6 +211,16 @@ class IF_HtPasswd
       	// CRYPT (only unix)
       	else
       	{
+      		//jouwei add 2107-1-11 start //not crypt
+      		if( strlen($pass)!=13){
+      			if ($password == $pass)
+      				return true;
+      			else
+      				return false;
+      		}
+      		
+      		//jouwei end
+      		
       		// The different length of salts.
       		$crypt_types = array("STD-DES" => 2, "EXT-DES" => 9, "MD5" => 12, "BLOWFISH" => 16);
 
@@ -282,7 +293,8 @@ class IF_HtPasswd
       // Split the line by ':'.
       // [0] = Username
       // [1] = Crypted password
-      $values = explode( ":", $line );
+      //$values = explode( ":", $line );
+      $values = explode( "=", $line );//jouwei 
 
       if( count( $values ) == 2 )
       {
@@ -310,9 +322,15 @@ class IF_HtPasswd
     // Open file and write the array of users to it.
     $fh = fopen( $filename, "w" );
     flock( $fh, LOCK_EX );
+    
+    //jouwei start
+    $line = "[users]\n";
+    fwrite( $fh, $line, strlen( $line ) );
+    //jouwei end
     foreach( $this->m_data as $usr=>$pwd )
     {
-      $line = $usr.":".$pwd."\n";
+      //$line = $usr.":".$pwd."\n";
+      $line = $usr."=".$pwd."\n";//jouwei
       fwrite( $fh, $line, strlen( $line ) );
     }
     flock( $fh, LOCK_UN );
@@ -347,7 +365,8 @@ class IF_HtPasswd
   			return self::crypt_apr1_md5($plainpasswd);
 
   		default:
-  			return self::crypt_apr1_md5($plainpasswd);
+  			//return self::crypt_apr1_md5($plainpasswd);
+  			return $plainpasswd; //jouwei 2017-1-11 not crypt
   	}
   }
 
